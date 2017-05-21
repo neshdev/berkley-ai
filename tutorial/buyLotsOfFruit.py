@@ -32,8 +32,8 @@ def buyLotsOfFruit(orderList):
 
     Returns cost of order
     """
-    totalCost = 0.0
-    "*** YOUR CODE HERE ***"
+    costPerItem = [ fruitPrices[fruit] * quantity for (fruit, quantity) in orderList ]
+    totalCost = sum(costPerItem)
     return totalCost
 
 # Main Method
