@@ -130,20 +130,21 @@ def uniformCostSearch(problem):
     "*** YOUR CODE HERE ***"
     closedSet = set()
     fringe = util.PriorityQueue()
-    init = problem.getStartState()
+    init_position = problem.getStartState()
     actions = []
-    fringe.push((actions,init),0)
-    closedSet.add(init)
+    init_step_cost = 0.
+    fringe.push(item=(actions, init_position, init_step_cost),priority=init_step_cost)
+    closedSet.add(init_position)
     
     while not fringe.isEmpty():
-       actions,current_state = fringe.pop()
+       actions, current_state, current_step_cost = fringe.pop()
        if problem.isGoalState(current_state):
            return actions
-       for (successor,action,stepCost) in problem.getSuccessors(current_state):
-           if successor not in closedSet:
+       for (successor_position,action,stepCost) in problem.getSuccessors(current_state):
+           if successor_position not in closedSet:
                nextAction = list(actions)
                nextAction.append(action)
-               fringe.push((nextAction,successor),stepCost)        
+               fringe.push((nextAction,successor_position, (current_step_cost + stepCost)),(current_step_cost + stepCost))        
        closedSet.add(current_state)
 
 def nullHeuristic(state, problem=None):
@@ -166,7 +167,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     
     while not fringe.isEmpty():
        actions, current_state, current_step_cost = fringe.pop()
-       print current_step_cost
        if problem.isGoalState(current_state):
            return actions
        for (successor_position,action,stepCost) in problem.getSuccessors(current_state):
