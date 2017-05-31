@@ -298,7 +298,6 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        print "starting"
         return self.startingPosition, self.corners
 
     def isGoalState(self, state):
@@ -308,7 +307,7 @@ class CornersProblem(search.SearchProblem):
         "*** YOUR CODE HERE ***"
         #print self.remaning
         curr, corners = state
-        return len(corners) == 0
+        return len(corners) == 1 and curr in corners
 
     def getSuccessors(self, state):
         """

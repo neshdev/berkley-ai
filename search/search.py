@@ -87,24 +87,7 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    
-#    closedSet = set()
-#    fringe = util.Stack()
-#    init = problem.getStartState()
-#    fringe.push(([],init))
-#    closedSet.add(init)
-#    
-#    while not fringe.isEmpty():
-#       actions,current_state = fringe.pop()
-#       if problem.isGoalState(current_state):
-#           return actions
-#       for (successor,action,stepCost) in problem.getSuccessors(current_state):
-#           if successor not in closedSet:
-#               nextAction = list(actions)
-#               nextAction.append(action)
-#               fringe.push((nextAction,successor))        
-#       closedSet.add(current_state)
-#    return []
+
     closedSet = set()
     fringe = util.PriorityQueue()
     actions = []
@@ -135,7 +118,7 @@ def breadthFirstSearch(problem):
     fringe = util.PriorityQueue()
     actions = []
     init_state = problem.getStartState()
-    init_step_cost = 0.
+    init_step_cost = 1.
     entry = (actions, init_state, init_step_cost)
     fringe.push(item=entry,priority=init_step_cost)
     
