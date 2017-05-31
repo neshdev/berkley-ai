@@ -40,6 +40,8 @@ from game import Actions
 import util
 import time
 import search
+from sets import Set
+
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -288,6 +290,7 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        
 
     def getStartState(self):
         """
@@ -295,14 +298,17 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        print "starting"
+        return self.startingPosition, self.corners
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        #print self.remaning
+        curr, corners = state
+        return len(corners) == 0
 
     def getSuccessors(self, state):
         """
@@ -323,6 +329,16 @@ class CornersProblem(search.SearchProblem):
             #   dx, dy = Actions.directionToVector(action)
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
+            curr_position, corners = state
+            x,y = curr_position
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not self.walls[nextx][nexty]:
+                nextState = (nextx, nexty), corners
+                if curr_position in corners:
+                    nextState = (nextx, nexty), tuple(x for x in corners if x != curr_position)
+
+                successors.append( ( nextState, action, 1) )
 
             "*** YOUR CODE HERE ***"
 
@@ -359,8 +375,13 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
+    curr_position, remaining_corners = state 
+    
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    
+    h = sum([util.manhattanDistance(curr_position, c) for c in remaining_corners])
+
+    return h # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"

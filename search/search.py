@@ -88,64 +88,98 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     
+#    closedSet = set()
+#    fringe = util.Stack()
+#    init = problem.getStartState()
+#    fringe.push(([],init))
+#    closedSet.add(init)
+#    
+#    while not fringe.isEmpty():
+#       actions,current_state = fringe.pop()
+#       if problem.isGoalState(current_state):
+#           return actions
+#       for (successor,action,stepCost) in problem.getSuccessors(current_state):
+#           if successor not in closedSet:
+#               nextAction = list(actions)
+#               nextAction.append(action)
+#               fringe.push((nextAction,successor))        
+#       closedSet.add(current_state)
+#    return []
     closedSet = set()
-    fringe = util.Stack()
-    init = problem.getStartState()
-    fringe.push(([],init))
-    closedSet.add(init)
+    fringe = util.PriorityQueue()
+    actions = []
+    init_state = problem.getStartState()
+    init_step_cost = 0.
+    entry = (actions, init_state, init_step_cost)
+    fringe.push(item=entry,priority=init_step_cost)
     
-    while not fringe.isEmpty():
-       actions,current_state = fringe.pop()
+    while not fringe.isEmpty():       
+       actions, current_state, current_step_cost = fringe.pop()
        if problem.isGoalState(current_state):
            return actions
-       for (successor,action,stepCost) in problem.getSuccessors(current_state):
-           if successor not in closedSet:
+       if current_state not in closedSet:
+           closedSet.add(current_state)
+           for (successor_state,action,stepCost) in problem.getSuccessors(current_state):
                nextAction = list(actions)
                nextAction.append(action)
-               fringe.push((nextAction,successor))        
-       closedSet.add(current_state)
+               greedy_cost = (current_step_cost - stepCost)
+               entry = (nextAction,successor_state, greedy_cost)
+               fringe.push(entry,greedy_cost)         
+    return []
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+      
     closedSet = set()
-    fringe = util.Queue()
-    init = problem.getStartState()
-    fringe.push(([],init))
-    closedSet.add(init)
+    fringe = util.PriorityQueue()
+    actions = []
+    init_state = problem.getStartState()
+    init_step_cost = 0.
+    entry = (actions, init_state, init_step_cost)
+    fringe.push(item=entry,priority=init_step_cost)
     
-    while not fringe.isEmpty():
-       actions,current_state = fringe.pop()
+    while not fringe.isEmpty():       
+       actions, current_state, current_step_cost = fringe.pop()
        if problem.isGoalState(current_state):
            return actions
-       for (successor,action,stepCost) in problem.getSuccessors(current_state):
-           if successor not in closedSet:
+       if current_state not in closedSet:
+           closedSet.add(current_state)
+           for (successor_state,action,stepCost) in problem.getSuccessors(current_state):
                nextAction = list(actions)
                nextAction.append(action)
-               fringe.push((nextAction,successor))        
-       closedSet.add(current_state)
+               greedy_cost = (current_step_cost + stepCost)
+               entry = (nextAction,successor_state, greedy_cost)
+               fringe.push(entry,greedy_cost)         
+    return []
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     closedSet = set()
     fringe = util.PriorityQueue()
-    init_position = problem.getStartState()
     actions = []
+    init_state = problem.getStartState()
     init_step_cost = 0.
-    fringe.push(item=(actions, init_position, init_step_cost),priority=init_step_cost)
-    closedSet.add(init_position)
+    entry = (actions, init_state, init_step_cost)
+    fringe.push(item=entry,priority=init_step_cost)
     
-    while not fringe.isEmpty():
+    while not fringe.isEmpty():       
        actions, current_state, current_step_cost = fringe.pop()
        if problem.isGoalState(current_state):
            return actions
-       for (successor_position,action,stepCost) in problem.getSuccessors(current_state):
-           if successor_position not in closedSet:
+       if current_state not in closedSet:
+           closedSet.add(current_state)
+           for (successor_state,action,stepCost) in problem.getSuccessors(current_state):
                nextAction = list(actions)
                nextAction.append(action)
-               fringe.push((nextAction,successor_position, (current_step_cost + stepCost)),(current_step_cost + stepCost))        
-       closedSet.add(current_state)
+               greedy_cost = (current_step_cost + stepCost)
+               entry = (nextAction,successor_state, greedy_cost)
+               fringe.push(entry,greedy_cost)        
+               
+    
+    return []
+       
 
 def nullHeuristic(state, problem=None):
     """
@@ -159,23 +193,29 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     closedSet = set()
     fringe = util.PriorityQueue()
-    init_position = problem.getStartState()
     actions = []
+    init_state = problem.getStartState()
     init_step_cost = 0.
-    fringe.push(item=(actions, init_position, init_step_cost),priority=heuristic(init_position,problem))
-    closedSet.add(init_position)
+    entry = (actions, init_state, init_step_cost)
+    fringe.push(item=entry,priority=heuristic(init_state,problem))
     
-    while not fringe.isEmpty():
+    while not fringe.isEmpty():       
        actions, current_state, current_step_cost = fringe.pop()
        if problem.isGoalState(current_state):
            return actions
-       for (successor_position,action,stepCost) in problem.getSuccessors(current_state):
-           if successor_position not in closedSet:
+       if current_state not in closedSet:
+           closedSet.add(current_state)
+           for (successor_state,action,stepCost) in problem.getSuccessors(current_state):
                nextAction = list(actions)
                nextAction.append(action)
-               fringe.push((nextAction,successor_position, (current_step_cost + stepCost)),(current_step_cost + stepCost) + heuristic(successor_position,problem))        
-       closedSet.add(current_state)
-
+               greedy_cost = (current_step_cost + stepCost)
+               heuristic_cost = heuristic(successor_state, problem)
+               entry = (nextAction,successor_state, greedy_cost)
+               fringe.push(entry,greedy_cost + heuristic_cost)        
+               
+    
+    return []
+    
 
 # Abbreviations
 bfs = breadthFirstSearch
