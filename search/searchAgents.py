@@ -358,6 +358,10 @@ class CornersProblem(search.SearchProblem):
         return len(actions)
 
 
+def euclideanCornerHeuristic(xy1, xy2):
+    "The Euclidean distance heuristic for a PositionSearchProblem"
+    return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5        
+        
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -378,7 +382,8 @@ def cornersHeuristic(state, problem):
     
     "*** YOUR CODE HERE ***"
     
-    h = sum([util.manhattanDistance(curr_position, c) for c in remaining_corners])
+    h = max([util.manhattanDistance(curr_position, c) for c in remaining_corners])
+    #h = min([euclideanCornerHeuristic(curr_position, c) for c in remaining_corners])
 
     return h # Default to trivial solution
 
