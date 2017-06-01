@@ -478,9 +478,69 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    
+    #h = wallHeuristic(foodGrid,position,problem)
+    #h = maxManhattahnHeuristic(foodGrid,position)
+    #h = remainingFoodPelletHeuristic(foodGrid)
+    #h = maxEuclideanHeuristic(foodGrid,position)
 
+    "*** YOUR CODE HERE ***"
+    
+    return h
+
+def wallHeuristic(foodGrid,position,problem):
+    """
+    search nodes expanded: 11950
+    """
+    h = 0
+    distances = [(util.manhattanDistance(position,food_position),food_position) for food_position in foodGrid.asList()]
+    if len(distances) == 0:
+        h = 0
+    else:
+        distance,food_position = max(distances)
+        min_pos = min(food_position,position)
+        max_pos = max(food_position,position)
+        
+        walls_in_path_to_max_food_pellet = len([x for x in problem.walls.asList() if x >= min_pos and x <= max_pos])
+        h = distance + walls_in_path_to_max_food_pellet
+    return h
+    
+def maxManhattahnHeuristic(foodGrid,position):
+    """
+    search nodes expanded: 9551
+    """
+    distances = [util.manhattanDistance(position,food_position) for food_position in foodGrid.asList()]
+    if len(distances) == 0:
+        return 0
+    else:
+        return max(distances)
+        
+def maxEuclideanHeuristic(foodGrid,position):
+    """
+    search nodes expanded: 14191
+    """
+    distances = [euclideanCornerHeuristic(position,food_position) for food_position in foodGrid.asList()]
+    if len(distances) == 0:
+        return 0
+    else:
+        return min(distances)
+
+def remainingFoodPelletHeuristic(foodGrid):
+    """
+    search nodes expanded: 12517
+    """
+    return len(foodGrid.asList())
+    
+def mazeHeuristic(foodGrid,position,problem):
+    total = []
+    for x, row in enumerate(foodGrid):
+        for y, cell in enumerate(row):
+            if foodGrid[x][y]:                
+                total.append(mazeDistance(position, (x,y), problem.startingGameState))
+    if total:
+        return max(total)
+    return 0
+    
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
     def registerInitialState(self, state):
