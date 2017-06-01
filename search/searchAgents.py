@@ -480,7 +480,7 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     
     #h = wallHeuristic(foodGrid,position,problem)
-    #h = maxManhattahnHeuristic(foodGrid,position)
+    h = maxManhattahnHeuristic(foodGrid,position)
     #h = remainingFoodPelletHeuristic(foodGrid)
     #h = maxEuclideanHeuristic(foodGrid,position)
 
@@ -532,6 +532,9 @@ def remainingFoodPelletHeuristic(foodGrid):
     return len(foodGrid.asList())
     
 def mazeHeuristic(foodGrid,position,problem):
+    """
+    search nodes expanded: 4000ish but takes long
+    """
     total = []
     for x, row in enumerate(foodGrid):
         for y, cell in enumerate(row):
@@ -570,7 +573,8 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        sol = search.bfs(problem)
+        return sol
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -604,9 +608,9 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x,y = state
-
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        _,food_position = min((util.manhattanDistance(state,food_position),food_position) for food_position in self.food.asList())
+        return state == food_position
 
 def mazeDistance(point1, point2, gameState):
     """
