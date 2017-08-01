@@ -41,6 +41,7 @@ import util
 import time
 import search
 from sets import Set
+import random
 
 
 class GoWestAgent(Agent):
@@ -479,8 +480,10 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     
-    #h = wallHeuristic(foodGrid,position,problem)
-    h = maxManhattahnHeuristic(foodGrid,position)
+    #h = wallHeuristicWithoutEdges(foodGrid,position,problem)
+    #h = distance_and_wall_Heuristic(foodGrid,position,problem)
+    h = top_n_with_Random(foodGrid,position,n=2)
+    #h = maxManhattahnHeuristic(foodGrid,position)
     #h = remainingFoodPelletHeuristic(foodGrid)
     #h = maxEuclideanHeuristic(foodGrid,position)
 
@@ -488,7 +491,40 @@ def foodHeuristic(state, problem):
     
     return h
 
-def wallHeuristic(foodGrid,position,problem):
+def top_n_with_Random(foodGrid,position,n=4):
+    distances = [(util.manhattanDistance(position,food_position),food_position) for food_position in foodGrid.asList()]
+    if len(distances) < n:
+        return 0
+    else:
+        pos = random.randrange(n)
+        distance, food_position = sorted(distances,reverse=True)[:n][pos]
+        return distance
+        
+    
+def wallHeuristicWithoutEdges(foodGrid,position,problem):
+    """
+    search nodes expanded: 13460
+    """
+    h = 0
+    distances = [(util.manhattanDistance(position,food_position),food_position) for food_position in foodGrid.asList()]
+    if len(distances) == 0:
+        h = 0
+    else:
+        distance,food_position = max(distances)
+        min_pos = min(food_position,position)
+        max_pos = max(food_position,position)
+        
+        walls = problem.walls.asList()
+        max_x, max_y = max(walls)
+        min_x, min_y = (0,0)
+                
+        walls_in_path_to_max_food_pellet = [x for x in walls if x >= min_pos and x <= max_pos]
+        walls_h = [(x,y) for (x,y) in walls_in_path_to_max_food_pellet if (x > min_x and y > min_y) and (x < max_x and y < max_y)]
+                
+        h = len(walls_h)
+    return h
+
+def distance_and_wall_Heuristic(foodGrid,position,problem):
     """
     search nodes expanded: 11950
     """
@@ -501,9 +537,12 @@ def wallHeuristic(foodGrid,position,problem):
         min_pos = min(food_position,position)
         max_pos = max(food_position,position)
         
-        walls_in_path_to_max_food_pellet = len([x for x in problem.walls.asList() if x >= min_pos and x <= max_pos])
-        h = distance + walls_in_path_to_max_food_pellet
+        walls = problem.walls.asList()
+                
+        walls_in_path_to_max_food_pellet = [x for x in walls if x >= min_pos and x <= max_pos]                
+        h = distance + len(walls_in_path_to_max_food_pellet)
     return h
+    
     
 def maxManhattahnHeuristic(foodGrid,position):
     """
@@ -533,7 +572,7 @@ def remainingFoodPelletHeuristic(foodGrid):
     
 def mazeHeuristic(foodGrid,position,problem):
     """
-    search nodes expanded: 4000ish but takes long
+    search nodes expanded: 4000ish but takes 2 long and is exact solution
     """
     total = []
     for x, row in enumerate(foodGrid):
