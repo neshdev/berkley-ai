@@ -15,6 +15,8 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
+import sys
+from enum import Enum
 
 from game import Agent
 
@@ -70,11 +72,55 @@ class ReflexAgent(Agent):
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
+        
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        
+        
+        w1 = 100.0
+        v1 = 1.0 if successorGameState.hasFood(*newPos) else 0
+        
+        w2 = 1.0
+        v2 = 10000.0 if len([x for x in currentGameState.getCapsules() if x == newPos]) > 0 else 0
+        
+        w3 = 1.0
+        v3 = successorGameState.getScore()
+        
+        w4 = .9
+        v4 = sum([manhattanDistance(newPos,ghost.getPosition()) for ghost in newGhostStates])
+        
+        w5 = 5.0
+        v5_dist = [manhattanDistance(newPos,x) for x in successorGameState.getCapsules()]
+        v5 = min(v5_dist) if len(v5_dist) > 0 else 0
+        v5 *= -1.0 if len(newScaredTimes) > 0 else 1
+        
+        w6 = 1.0
+        v6 = -1000.0 if currentGameState.getPacmanPosition() == newPos else 0.0
+        
+        w7 = .01
+        v7 = sum([manhattanDistance(newPos,d) for d in successorGameState.getFood()])
+        
+        w = []
+        v = []
+        for i in range(1,8):
+            w.append(eval( "w" + str(i) ))
+            v.append(eval( "v" + str(i) ))
+        
+        print "w", w
+        print "v", v
+        
+        reward = dot(v,w)
+        print reward
+        return reward
+    
+    
+def dot(v,w):
+    if len(v) != len(w):
+        raise ValueError("vectors are not the same size")
+    multiply = lambda k : v[k] * w[k]
+    return sum(map(multiply, range(len(v))))
+    
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -129,7 +175,120 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        currGameState = gameState
+        currentDepth = 0
+        maxDepth = self.depth
+        currAgentIndex = 0
+        maxNumOfAgents = gameState.getNumAgents() 
+        action = None
+        
+        state = AugmentedGameState(currGameState,currentDepth,maxDepth,currAgentIndex,maxNumOfAgents,action)
+        identifyAgent = self.identifyAgent
+        successor = self.successorFn
+        
+        v = self.dispatcher(state,identifyAgent,successor)
+        path = state.path()
+        
+        return path[0]
+    
+    def identifyAgent(self, state):
+        currGameState = state.currGameState
+        currentDepth = state.currentDepth
+        maxDepth = state.maxDepth
+        currAgentIndex = state.currAgentIndex
+        maxNumOfAgents = state.maxNumOfAgents
+        action = state.action
+        
+        if currentDepth == maxDepth: return Agent.LEAF
+        elif currGameState.isWin() or currGameState.isLose() : return Agent.LEAF
+        elif currAgentIndex == 0: return Agent.MAX
+        else: return Agent.MIN
+        
+    def successorFn(self, state):
+        currGameState = state.currGameState
+        currentDepth = state.currentDepth
+        maxDepth = state.maxDepth
+        currAgentIndex = state.currAgentIndex
+        maxNumOfAgents = state.maxNumOfAgents
+        _ = state.action
+        
+        actions = currGameState.getLegalActions(currAgentIndex)
+        nextAgentIndex = 0 if currAgentIndex == (maxNumOfAgents-1) else currAgentIndex+1
+        nextDepth = currentDepth+1 if nextAgentIndex == 0 else currentDepth
+
+        return [AugmentedGameState(currGameState.generateSuccessor(currAgentIndex, action),nextDepth,maxDepth,nextAgentIndex,maxNumOfAgents,action) for action in actions]
+       
+    def dispatcher(self, state, identifyAgent, successor):
+        agent = identifyAgent(state)
+        if   agent == Agent.MAX: return self.max_value(state,identifyAgent,successor)
+        elif agent == Agent.MIN: return self.min_value(state,identifyAgent,successor)
+        else:                    
+            result = self.evaluationFunction(state.currGameState)
+            return result
+    
+    def min_value(self, state, identifyAgent, successor):
+        v = float('inf')
+        next_best_game_state = None
+        for s in successor(state):
+            m = self.dispatcher(s,identifyAgent,successor)            
+            if (m <= v):
+                v = m
+                next_best_game_state = s
+                
+            #print v
+            #print "MIN",s
+        state.next_best_game_state = next_best_game_state
+        return v
+    
+    def max_value(self, state,identifyAgent,successor):
+        v = float('-inf')
+        next_best_game_state = None
+        for s in successor(state):
+            m = self.dispatcher(s,identifyAgent,successor)            
+            if (m >= v):
+                v = m
+                next_best_game_state = s
+            #print v
+            #print "MAX",s
+        state.next_best_game_state = next_best_game_state
+        return v
+
+class AugmentedGameState():
+    def __init__(self,currGameState,currentDepth,maxDepth,currAgentIndex,maxNumOfAgents,action):
+        self.currGameState = currGameState
+        self.currentDepth = currentDepth
+        self.maxDepth = maxDepth
+        self.currAgentIndex = currAgentIndex
+        self.maxNumOfAgents = maxNumOfAgents
+        self.action = action
+        self.next_best_game_state = None
+    
+    def path(self):
+        acc = []
+        self.buildPath(self.next_best_game_state,acc)
+        return acc
+                        
+    def buildPath(self,state,acc):
+        if (state is None): return acc
+        else:
+            acc.append(state.action)
+            self.buildPath(state.next_best_game_state,acc)
+    def __str__(self):
+        desc = "augmented agent:\n"
+        for k,v in vars(self).items():
+            desc += str(k) + ":" + str(v) + "\n"
+        return desc
+        
+class Agent(Enum):
+    MIN = 1
+    MAX = 2
+    CHANCE = 3
+    LEAF = 4
+    
+    
+
+    
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
