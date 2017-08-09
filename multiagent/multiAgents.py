@@ -300,7 +300,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         v,a = self.alphabeta(gameState, self.depth, float("-inf"), float("inf"), True, 0)
-        print "value",v
+        #print "value",v
         return a
     
     def isTerminal(self, gameState):
@@ -309,13 +309,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     def isMaximizingPlayer(self,agentIndex):
         return agentIndex==0
     
-    def max_value(self, gameState, agentIndex, depth, alpha, beta):
-        #print "max_value starting"
-        
+    def max_value(self, gameState, agentIndex, depth, alpha, beta):       
         nextAgentIndex = 0 if agentIndex == (gameState.getNumAgents()-1) else agentIndex+1
         nextDepth = depth-1 if self.isMaximizingPlayer(nextAgentIndex) else depth
-        
-        #print "D", depth,nextDepth
                 
         v = float('-inf')
         best_action = None
@@ -327,22 +323,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             if (v < m[0]):
                 v = m[0]
                 best_action = action
-                #print "made it", best_action
-            #print "value", v
-            #print "before alpha", alpha
-            #print "before beta", beta
             if (v > beta): 
                 break
             alpha = max(alpha, v)
-            #print "after alpha", alpha
-            #print "after beta", beta
-            #print "max",action
-        #print "max_value ending"
         return (v,best_action)
         
     def min_value(self, gameState, agentIndex, depth, alpha, beta):
-        #print "min_value starting"
-        
         nextAgentIndex = 0 if agentIndex == (gameState.getNumAgents() -1) else agentIndex+1
         nextDepth = depth-1 if self.isMaximizingPlayer(nextAgentIndex) else depth
        
@@ -356,23 +342,14 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             if ( v > m[0]):
                 v = m[0]
                 best_action = action
-            #   print "made it", best_action
-            #print "value", v
-            #print "before alpha", alpha
-            #print "before beta", beta
             if (v < alpha): 
                 break
             beta = min(beta,v)
-            #print "after alpha", alpha
-            #print "after beta", beta
-            #print "min",action
-        #print "min_value ending"
         return (v,best_action)
     
     def alphabeta(self, gameState, depth, alpha, beta, maximizingPlayer, currentAgentIndex):
         if depth == 0 or self.isTerminal(gameState): 
             score = self.evaluationFunction(gameState)
-            #print "score", score
             return (score, None)
         agentIndex = currentAgentIndex
         if maximizingPlayer : return self.max_value(gameState,agentIndex,depth,alpha,beta)
