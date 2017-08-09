@@ -369,7 +369,51 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        v,a = self.expectimax(gameState, self.depth, True, 0)
+        #print "value",v
+        return a
+    
+    def isTerminal(self, gameState):
+        return gameState.isWin() or gameState.isLose()
+                 
+    def isMaximizingPlayer(self,agentIndex):
+        return agentIndex==0
+    
+    def max_value(self, gameState, agentIndex, depth):       
+        nextAgentIndex = 0 if agentIndex == (gameState.getNumAgents()-1) else agentIndex+1
+        nextDepth = depth-1 if self.isMaximizingPlayer(nextAgentIndex) else depth
+        v = float('-inf')
+        best_action = None
+        actions = gameState.getLegalActions(agentIndex)
+        for action in actions:
+            succGameState = gameState.generateSuccessor(agentIndex, action)
+            m = self.expectimax(succGameState, nextDepth, self.isMaximizingPlayer(nextAgentIndex),nextAgentIndex)
+            if (v < m[0]):
+                v = m[0]
+                best_action = action
+        return (v,best_action)
+        
+    def expected_value(self, gameState, agentIndex, depth):
+        nextAgentIndex = 0 if agentIndex == (gameState.getNumAgents() -1) else agentIndex+1
+        nextDepth = depth-1 if self.isMaximizingPlayer(nextAgentIndex) else depth
+       
+        v = float('0')
+        best_action = None
+        actions = gameState.getLegalActions(agentIndex)
+        p = 1.0/len(actions)
+        for action in actions:
+            succGameState = gameState.generateSuccessor(agentIndex, action)
+            m = self.expectimax(succGameState, nextDepth,self.isMaximizingPlayer(nextAgentIndex),nextAgentIndex)
+            v += p * m[0]
+        return (v,best_action)
+    
+    def expectimax(self, gameState, depth, maximizingPlayer, currentAgentIndex):
+        if depth == 0 or self.isTerminal(gameState): 
+            score = self.evaluationFunction(gameState)
+            return (score, None)
+        agentIndex = currentAgentIndex
+        if maximizingPlayer : return self.max_value(gameState,agentIndex,depth)
+        else : return self.expected_value(gameState,agentIndex,depth)
 
 def betterEvaluationFunction(currentGameState):
     """
