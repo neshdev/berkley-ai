@@ -5,3 +5,5 @@ python autograder.py -t test_cases/q2/0-small-tree
 python autograder.py -q q2
 
 python autograder.py -t test_cases/q2/1-1-minmax
+
+python autograder.py -t test_cases/q3/0-lecture-6-tree

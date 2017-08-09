@@ -189,7 +189,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         
         v = self.dispatcher(state,identifyAgent,successor)
         path = state.path()
-        
         return path[0]
     
     def identifyAgent(self, state):
@@ -300,7 +299,79 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        v,a = self.alphabeta(gameState, self.depth, float("-inf"), float("inf"), True, 0)
+        print "value",v
+        return a
+    
+    def isTerminal(self, gameState):
+        return gameState.isWin() or gameState.isLose()
+                 
+    def isMaximizingPlayer(self,agentIndex):
+        return agentIndex==0
+    
+    def max_value(self, gameState, agentIndex, depth, alpha, beta):
+        print "max_value starting"
+        nextAgentIndex = agentIndex+1
+        nextDepth = depth-1 if self.isMaximizingPlayer(nextAgentIndex) else nextDepth
+        v = float('-inf')
+        best_action = None
+        actions = gameState.getLegalActions(agentIndex)
+        for action in actions:
+            succGameState = gameState.generateSuccessor(agentIndex, action)
+            m = self.alphabeta(succGameState, depth-1, alpha, beta, self.isMaximizingPlayer(nextAgentIndex),nextAgentIndex)
+            #v = max(v, m[0])
+            if (v < m[0]):
+                v = m[0]
+                best_action = action
+                print "made it"
+            print "value", v
+            print "before alpha", alpha
+            print "before beta", beta
+            if (v > beta): 
+                break
+            alpha = max(alpha, v)
+            print "after alpha", alpha
+            print "after beta", beta
+            print "max",action
+        print "max_value ending"
+        return (v,best_action)
+        
+    def min_value(self, gameState, agentIndex, depth, alpha, beta):
+        print "min_value starting"
+        nextAgentIndex = agentIndex+1
+        nextDepth = depth-1 if self.isMaximizingPlayer(nextAgentIndex) else nextDepth
+        v = float('inf')
+        best_action = None
+        actions = gameState.getLegalActions(agentIndex)
+        for action in actions:
+            succGameState = gameState.generateSuccessor(agentIndex, action)
+            m = self.alphabeta(succGameState, depth-1, alpha, beta, self.isMaximizingPlayer(nextAgentIndex),nextAgentIndex)
+            #v = min(v, m[0])
+            if ( v > m[0]):
+                v = m[0]
+                best_action = action
+                print "made it"
+            print "value", v
+            print "before alpha", alpha
+            print "before beta", beta
+            if (v < alpha): 
+                break
+            beta = min(beta,v)
+            print "after alpha", alpha
+            print "after beta", beta
+            print "min",action
+        print "min_value ending"
+        return (v,best_action)
+    
+    def alphabeta(self, gameState, depth, alpha, beta, maximizingPlayer, currentAgent):
+        if depth == 0 or self.isTerminal(gameState): 
+            score = self.evaluationFunction(gameState)
+            print "score", score
+            return (score, None)
+        agentIndex = currentAgent % self.depth
+        if maximizingPlayer : return self.max_value(gameState,agentIndex,depth,alpha,beta)
+        else : return self.min_value(gameState,agentIndex,depth,alpha,beta)
+    
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
