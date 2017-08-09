@@ -310,65 +310,71 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         return agentIndex==0
     
     def max_value(self, gameState, agentIndex, depth, alpha, beta):
-        print "max_value starting"
-        nextAgentIndex = agentIndex+1
-        nextDepth = depth-1 if self.isMaximizingPlayer(nextAgentIndex) else nextDepth
+        #print "max_value starting"
+        
+        nextAgentIndex = 0 if agentIndex == (gameState.getNumAgents()-1) else agentIndex+1
+        nextDepth = depth-1 if self.isMaximizingPlayer(nextAgentIndex) else depth
+        
+        #print "D", depth,nextDepth
+                
         v = float('-inf')
         best_action = None
         actions = gameState.getLegalActions(agentIndex)
         for action in actions:
             succGameState = gameState.generateSuccessor(agentIndex, action)
-            m = self.alphabeta(succGameState, depth-1, alpha, beta, self.isMaximizingPlayer(nextAgentIndex),nextAgentIndex)
-            #v = max(v, m[0])
+            m = self.alphabeta(succGameState, nextDepth, alpha, beta, self.isMaximizingPlayer(nextAgentIndex),nextAgentIndex)
+            
             if (v < m[0]):
                 v = m[0]
                 best_action = action
-                print "made it"
-            print "value", v
-            print "before alpha", alpha
-            print "before beta", beta
+                #print "made it", best_action
+            #print "value", v
+            #print "before alpha", alpha
+            #print "before beta", beta
             if (v > beta): 
                 break
             alpha = max(alpha, v)
-            print "after alpha", alpha
-            print "after beta", beta
-            print "max",action
-        print "max_value ending"
+            #print "after alpha", alpha
+            #print "after beta", beta
+            #print "max",action
+        #print "max_value ending"
         return (v,best_action)
         
     def min_value(self, gameState, agentIndex, depth, alpha, beta):
-        print "min_value starting"
-        nextAgentIndex = agentIndex+1
-        nextDepth = depth-1 if self.isMaximizingPlayer(nextAgentIndex) else nextDepth
+        #print "min_value starting"
+        
+        nextAgentIndex = 0 if agentIndex == (gameState.getNumAgents() -1) else agentIndex+1
+        nextDepth = depth-1 if self.isMaximizingPlayer(nextAgentIndex) else depth
+       
         v = float('inf')
         best_action = None
         actions = gameState.getLegalActions(agentIndex)
         for action in actions:
             succGameState = gameState.generateSuccessor(agentIndex, action)
-            m = self.alphabeta(succGameState, depth-1, alpha, beta, self.isMaximizingPlayer(nextAgentIndex),nextAgentIndex)
-            #v = min(v, m[0])
+            m = self.alphabeta(succGameState, nextDepth, alpha, beta, self.isMaximizingPlayer(nextAgentIndex),nextAgentIndex)
+            
             if ( v > m[0]):
                 v = m[0]
                 best_action = action
-                print "made it"
-            print "value", v
-            print "before alpha", alpha
-            print "before beta", beta
+            #   print "made it", best_action
+            #print "value", v
+            #print "before alpha", alpha
+            #print "before beta", beta
             if (v < alpha): 
                 break
             beta = min(beta,v)
-            print "after alpha", alpha
-            print "after beta", beta
-            print "min",action
-        print "min_value ending"
+            #print "after alpha", alpha
+            #print "after beta", beta
+            #print "min",action
+        #print "min_value ending"
         return (v,best_action)
     
-    def alphabeta(self, gameState, depth, alpha, beta, maximizingPlayer, currentAgent):
+    def alphabeta(self, gameState, depth, alpha, beta, maximizingPlayer, currentAgentIndex):
         if depth == 0 or self.isTerminal(gameState): 
             score = self.evaluationFunction(gameState)
-            print "score", score
+            #print "score", score
             return (score, None)
-        agentIndex = currentAgent % self.depth
+        agentIndex = currentAgentIndex
         if maximizingPlayer : return self.max_value(gameState,agentIndex,depth,alpha,beta)
         else : return self.min_value(gameState,agentIndex,depth,alpha,beta)
     
