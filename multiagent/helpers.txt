@@ -6,4 +6,33 @@ python autograder.py -q q2
 
 python autograder.py -t test_cases/q2/1-1-minmax
 
-python autograder.py -t test_cases/q3/0-lecture-6-tree
+python autograder.py -t test_cases/q3/0-lecture-6-tree.test
+python autograder.py -t test_cases/q3/0-small-tree.test
+python autograder.py -t test_cases/q3/1-1-minmax.test
+python autograder.py -t test_cases/q3/1-2-minmax.test
+python autograder.py -t test_cases/q3/1-3-minmax.test
+python autograder.py -t test_cases/q3/1-4-minmax.test
+python autograder.py -t test_cases/q3/1-5-minmax.test
+python autograder.py -t test_cases/q3/1-6-minmax.test
+python autograder.py -t test_cases/q3/1-7-minmax.test
+python autograder.py -t test_cases/q3/1-8-minmax.test
+python autograder.py -t test_cases/q3/2-1a-vary-depth.test
+python autograder.py -t test_cases/q3/2-1b-vary-depth.test
+python autograder.py -t test_cases/q3/2-2a-vary-depth.test
+python autograder.py -t test_cases/q3/2-2b-vary-depth.test
+python autograder.py -t test_cases/q3/2-3a-vary-depth.test
+python autograder.py -t test_cases/q3/2-3b-vary-depth.test
+python autograder.py -t test_cases/q3/2-4a-vary-depth.test
+python autograder.py -t test_cases/q3/2-4b-vary-depth.test
+python autograder.py -t test_cases/q3/2-one-ghost-3level.test
+python autograder.py -t test_cases/q3/3-one-ghost-4level.test
+python autograder.py -t test_cases/q3/4-two-ghosts-3level.test
+python autograder.py -t test_cases/q3/5-two-ghosts-4level.test
+python autograder.py -t test_cases/q3/6-tied-root.test
+python autograder.py -t test_cases/q3/7-1a-check-depth-one-ghost.test
+python autograder.py -t test_cases/q3/7-1b-check-depth-one-ghost.test
+python autograder.py -t test_cases/q3/7-1c-check-depth-one-ghost.test
+python autograder.py -t test_cases/q3/7-2a-check-depth-two-ghosts.test
+python autograder.py -t test_cases/q3/7-2b-check-depth-two-ghosts.test
+python autograder.py -t test_cases/q3/7-2c-check-depth-two-ghosts.test
+python autograder.py -t test_cases/q3/8-pacman-game.test
