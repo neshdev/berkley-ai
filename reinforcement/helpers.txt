@@ -1,0 +1,9 @@
+python autograder.py -t test_cases/q1/1-tinygrid
+
+python autograder.py -t test_cases/q3/1-question-3.1
+python autograder.py -t test_cases/q3/2-question-3.2
+python autograder.py -t test_cases/q3/3-question-3.3
+python autograder.py -t test_cases/q3/4-question-3.4
+python autograder.py -t test_cases/q3/5-question-3.5
+
+python gridworld.py -a value -g DiscountGrid --discount 0.01 --noise 0.01 --livingReward .01
