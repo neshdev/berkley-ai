@@ -266,7 +266,7 @@ class ParticleFilter(InferenceModule):
         n = self.numParticles
         rem = count % n
         particles = [pos for i in range(n//count) for pos in list(self.legalPositions)]
-        particles.extend(list(self.legalPositions)[0:rem+1])
+        particles.extend(list(self.legalPositions)[0:rem])
         self.particles = particles
         
         #length = len(self.legalPositions)
@@ -356,9 +356,8 @@ class ParticleFilter(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
         beliefs = util.Counter()
-        
-        for pos in list(self.legalPositions):
-            beliefs[pos] = sum([1 for p in self.particles if p == pos])   
+        for p in self.particles:
+            beliefs[p] = beliefs[p]+1
         beliefs.normalize()
         return beliefs
         
