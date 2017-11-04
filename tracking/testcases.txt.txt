@@ -1,0 +1,14 @@
+python autograder.py -t test_cases/q1/1-ExactObserve
+
+python autograder.py -t test_cases/q2/2-ExactElapse
+
+python autograder.py -t test_cases/q3/2-ExactObserveElapse
+
+python autograder.py -q q1
+python autograder.py -q q2
+python autograder.py -q q3 --no-graphics
+python autograder.py -q q3
+python autograder.py -q q4 --no-graphics
+
+python autograder.py -t test_cases/q4/5-ParticleObserve.test
+python autograder.py -t test_cases/q3/2-ExactObserveElapse

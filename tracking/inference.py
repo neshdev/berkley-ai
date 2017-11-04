@@ -147,21 +147,24 @@ class ExactInference(InferenceModule):
         noisyDistance = observation
         emissionModel = busters.getObservationDistribution(noisyDistance)
         pacmanPosition = gameState.getPacmanPosition()
-
+       
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
+        
         # Replace this code with a correct observation update
         # Be sure to handle the "jail" edge case where the ghost is eaten
         # and noisyDistance is None
         allPossible = util.Counter()
-        for p in self.legalPositions:
-            trueDistance = util.manhattanDistance(p, pacmanPosition)
-            if emissionModel[trueDistance] > 0:
-                allPossible[p] = 1.0
+        
+        if noisyDistance == None:
+            allPossible[self.getJailPosition()] = 1.0
+        else:           
+            for p in self.legalPositions:
+                trueDistance = util.manhattanDistance(p, pacmanPosition)
+                if emissionModel[trueDistance] > 0:
+                    allPossible[p] = self.beliefs[p] * emissionModel[trueDistance]
 
         "*** END YOUR CODE HERE ***"
-
+        
         allPossible.normalize()
         self.beliefs = allPossible
 
@@ -218,8 +221,13 @@ class ExactInference(InferenceModule):
         are used and how they combine to give us a belief distribution over new
         positions after a time update from a particular position.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        "*** YOUR CODE HERE ***"    
+        allPossible = util.Counter()
+        for x in self.legalPositions:
+            newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, x))
+            for newPos, prob in newPosDist.items():
+                allPossible[newPos] += prob*self.beliefs[x]
+        self.beliefs = allPossible
 
     def getBeliefDistribution(self):
         return self.beliefs
@@ -254,7 +262,26 @@ class ParticleFilter(InferenceModule):
         weight with each position) is incorrect and may produce errors.
         """
         "*** YOUR CODE HERE ***"
+        count = len(self.legalPositions)
+        n = self.numParticles
+        rem = count % n
+        particles = [pos for i in range(n//count) for pos in list(self.legalPositions)]
+        particles.extend(list(self.legalPositions)[0:rem+1])
+        self.particles = particles
+        
+        #length = len(self.legalPositions)
+        #distribution = [1.0/length for x in list(self.legalPositions)]
+        #values = list(self.legalPositions)
+        #n = self.numParticles
+        #particles = util.nSample(distribution,values,n)
+        #self.particles = particles
 
+        
+    def resample(self, distribution, values):
+        n = self.numParticles
+        particles = util.nSample(distribution,values,n)
+        self.particles = particles;
+        
     def observe(self, observation, gameState):
         """
         Update beliefs based on the given distance observation. Make sure to
@@ -286,7 +313,22 @@ class ParticleFilter(InferenceModule):
         emissionModel = busters.getObservationDistribution(noisyDistance)
         pacmanPosition = gameState.getPacmanPosition()
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        distribution = []
+        
+        if noisyDistance is None:
+            self.particles = [self.getJailPosition() for x in self.particles]
+        else:
+            for pos in self.particles:
+                trueDistance = util.manhattanDistance(pos, pacmanPosition)
+                distribution.append(emissionModel[trueDistance])
+            
+            if sum(distribution) == 0:
+                self.initializeUniformly(gameState)
+            else:
+                normalize = sum(distribution)
+                distribution = [prob / normalize for prob in distribution]
+                self.resample(distribution,self.particles)
 
     def elapseTime(self, gameState):
         """
@@ -313,7 +355,13 @@ class ParticleFilter(InferenceModule):
         Counter object)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        beliefs = util.Counter()
+        
+        for pos in list(self.legalPositions):
+            beliefs[pos] = sum([1 for p in self.particles if p == pos])   
+        beliefs.normalize()
+        return beliefs
+        
 
 class MarginalInference(InferenceModule):
     """
