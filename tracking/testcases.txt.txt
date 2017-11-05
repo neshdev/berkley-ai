@@ -10,5 +10,9 @@ python autograder.py -q q3 --no-graphics
 python autograder.py -q q3
 python autograder.py -q q4 --no-graphics
 
-python autograder.py -t test_cases/q4/5-ParticleObserve.test
+python autograder.py -q q6 --no-graphics
+
+python autograder.py -t test_cases/q4/5-ParticleObserve
 python autograder.py -t test_cases/q3/2-ExactObserveElapse
+python autograder.py -t test_cases/q6/2-JointParticleObserve
+
